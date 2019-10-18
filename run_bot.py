@@ -1,14 +1,83 @@
+import string
 import telebot
 import os
 import cv2
 import numpy as np
 from yolo_coco_net import YoloCocoNet
 import argparse
+import random
 
 
 TOKEN = '687390205:AAGzjP1hTwpVYhSdBnmHSE1-Hy7UeCKHG78'
 bot = telebot.TeleBot(TOKEN)
 net = YoloCocoNet('data')
+
+
+class ReplyCompositor:
+    def __init__(self):
+        # Replies are splitted
+        # into 10 levels of confidence:
+        #
+        # Level 1 - 90-100 %
+        # Level 2 - 80-90 %
+        # Level 3 - 70-80 %
+        # ...
+        #
+        # ! Fill free to expand the levels
+        # ! with phrases you think describe
+        # ! the level the best way
+        #
+        # The first missed part
+        # is an article (a, an)
+        # The second messed part
+        # is the class name of the
+        # object
+        self.reply_level_1 = [
+            "I'm completely sure it's {} {}.",
+            "It's {} {}. I'm sure.",
+            "I'm 100% sure it's {} {}."
+        ]
+        self.reply_level_2 = [
+            "Pretty sure it's {} {}.",
+            "It's {} {}."
+        ]
+        self.reply_level_3 = [
+            "I see {} {}."
+        ]
+        self.reply_level_4 = [
+            "It's {} {}, isn't it?"
+        ]
+        self.reply_level_5 = [
+            "It looks like {} {}."
+        ]
+        self.reply_level_6 = [
+            "Hmmm. Is it a {} {}?"
+        ]
+        self.reply_level_7 = [
+            "I'm unsure but it's pretty similar to {} {}."
+        ]
+        self.reply_level_8 = [
+            "So can hardly see anything... Wait... It's {} {}... or a banana..."
+        ]
+        self.reply_level_9 = [
+            "I could be anything. {} {}, a dinosaur, a lake. I don't know. Really."
+        ]
+        self.reply_level_10 = [
+            "There is nothing on the image. Or at lease I can't see anything."
+        ]
+
+    def format_reply(self, class_name, confidence):
+        assert 0.0 <= confidence <= 1.0
+        confidence_level = (100 - confidence * 100) // 10 + 1
+        appropriate_templates = getattr(
+            self, 'reply_level_{}'.format(int(confidence_level)))
+        template = random.choice(appropriate_templates)
+        # choose a article
+        article = 'an' if class_name[0] in 'aeiou' else 'a'
+        return template.format(article, class_name)
+
+
+reply_compositor = ReplyCompositor()
 
 
 def objects_on_image(image):
@@ -36,11 +105,30 @@ def objects_on_image(image):
 
 
 def format_reply(objects):
-    # TODO: here frontend goes. Update it
+    """
 
-    reply = '\n'.join(str(k) + ' -> ' + str(v) for k, v in objects.items())
-    if reply == '':
-        reply = 'There was no objects detected'
+    Arguments:
+        objects {dict} -- class_name -> confidence
+
+    Returns:
+        str -- reply
+    """
+    most_probable_class_name = None
+    higher_confidence = None
+
+    for class_name, confidence in objects.items():
+
+        # initial class name
+        if most_probable_class_name is None:
+            most_probable_class_name = class_name
+            higher_confidence = confidence
+
+        elif confidence > higher_confidence:
+            most_probable_class_name = class_name
+            higher_confidence = confidence
+
+    reply = reply_compositor.format_reply(
+        most_probable_class_name, higher_confidence)
     return reply
 
 
