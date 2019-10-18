@@ -1,0 +1,7 @@
+.vscode/
+.idea/
+.pytest_cache
+images/
+__pycache__/
+yolov3.cfg
+yolov3.weights
