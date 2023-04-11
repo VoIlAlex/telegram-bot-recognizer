@@ -177,4 +177,7 @@ def reply_to_image(message: telebot.types.Message):
 
 
 if __name__ == "__main__":
+    try:
+        bot.remove_webhook()
+    except: ...
     bot.polling()

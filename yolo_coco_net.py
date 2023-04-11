@@ -30,7 +30,9 @@ class YoloCocoNet:
         self.net = cv2.dnn.readNetFromDarknet(path_to_config, path_to_weights)
 
         layer_names = self.net.getLayerNames()
-        self.layer_names = [layer_names[i[0] - 1]
+        print(layer_names)
+        print(self.net.getUnconnectedOutLayers())
+        self.layer_names = [layer_names[i - 1]
                             for i in self.net.getUnconnectedOutLayers()]
 
     def detect(self, frame, min_confidence, min_nms_threshold):

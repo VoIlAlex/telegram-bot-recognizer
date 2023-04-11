@@ -6,7 +6,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - ./.env
     command: [
-      "python", "run_bot.py"
+      "python3", "run_bot.py"
     ]
 

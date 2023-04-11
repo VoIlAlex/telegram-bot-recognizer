@@ -1,9 +1,12 @@
-FROM python:3.11-alpine3.17
-
-RUN apk update && apk add --update gcc python3-dev musl-dev linux-headers g++
+FROM hdgigante/python-opencv:4.7.0-ubuntu
 
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+
+COPY data ./data
 COPY install.sh .
 RUN sh install.sh
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY run_bot.py .
+COPY yolo_coco_net.py .
