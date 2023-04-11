@@ -1,14 +1,12 @@
-import string
 import telebot
 import os
 import cv2
-import numpy as np
 from yolo_coco_net import YoloCocoNet
 import argparse
 import random
 
 
-TOKEN = '687390205:AAGzjP1hTwpVYhSdBnmHSE1-Hy7UeCKHG78'
+TOKEN = os.getenv("TG_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 net = YoloCocoNet('data')
 
