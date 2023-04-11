@@ -176,6 +176,15 @@ def reply_to_image(message: telebot.types.Message):
         pass
 
 
+@bot.message_handler(commands=["start"])
+def reply_to_start(message: telebot.types.Message):
+    bot.send_message(
+        message.chat.id,
+        "Hello! Welcome to Recognizer bot.\n"
+        "Send me some image and I'll guess what is it."
+    )
+
+
 if __name__ == "__main__":
     try:
         bot.remove_webhook()
